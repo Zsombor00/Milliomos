@@ -74,7 +74,7 @@ void show_record() {
 void readQuestions(struct List *list) {
 	printf("Reading questions...\n");
 
-	FILE *filepointer = fopen("/Users/kornelkotan/GIT/zsombor00/Milliomos/src/loim.txt", "r");
+	FILE *filepointer = fopen("src/loim.txt", "r");
 	if (filepointer == NULL) {
 		perror("Error");
 	} else {
@@ -109,13 +109,13 @@ void showMenu() {
 }
 
 void askQuestion(struct List *list, int difficulty) {
-	struct Question iterator = list->first;
-	while(iterator!=NULL)
-	{
-		if(iterator->difficulty )
-	     // do something
-		iterator= iterator->next;
-	}
+//	struct Question iterator = list->first;
+//	while(iterator!=NULL)
+//	{
+//		if(iterator->difficulty )
+//	     // do something
+//		iterator= iterator->next;
+//	}
 }
 
 //Main
