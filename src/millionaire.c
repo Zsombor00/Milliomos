@@ -51,7 +51,6 @@ typedef struct Player //A j�t�kosok "tulajdons�gai".
 	struct Player* next_player;
 };
 
-
 //Function definitions
 
 struct GameTime idofgv(int masodpercben) //M�sodpercet id�form�tumba(�ra, perc, m�sodperc) �tv�lt� f�ggv�ny.
@@ -73,19 +72,17 @@ void show_record() {
 }
 
 void readQuestions(struct List *list) {
-	printf("Reading questions...");
+	printf("Reading questions...\n");
 
-	FILE *filepointer = fopen("/Users/kornelkotan/workspaces/eclipse-cpp-ws/millionaire/src/loim.txt", "r");
+	FILE *filepointer = fopen("/Users/kornelkotan/GIT/zsombor00/Milliomos/src/loim.txt", "r");
 	if (filepointer == NULL) {
 		perror("Error");
 	} else {
 		while (!feof(filepointer)) {
-
 			struct Question *q = (struct Question*) malloc(sizeof(struct Question));
 
 			fscanf(filepointer, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c", &q->difficulty, &q->question, &q->anwserA, &q->anwserB, &q->anwserC, &q->anwserD,
 					&q->rightanwser);
-
 			q->next = NULL;
 
 			if (list->first == NULL) {
@@ -96,14 +93,12 @@ void readQuestions(struct List *list) {
 
 			list->last = q;
 			list->size++;
-
 		}
 	}
 }
-//Main
 
-int main() {
-	menu: printf("________________________________________\n");
+void showMenu() {
+	printf("________________________________________\n");
 	printf("       LEGYEN ON IS MILLIOMOS!\n");
 	printf("________________________________________\n");
 	printf("________________________________________\n");
@@ -111,6 +106,22 @@ int main() {
 	printf(" -> Nyomjon E-t az eredmenyek megtekintesehez\n");
 	printf(" -> Nyomjon Q-t a kilepeshez\n");
 	printf("________________________________________\n");
+}
+
+void askQuestion(struct List *list, int difficulty) {
+	struct Question iterator = list->first;
+	while(iterator!=NULL)
+	{
+		if(iterator->difficulty )
+	     // do something
+		iterator= iterator->next;
+	}
+}
+
+//Main
+
+int main() {
+	showMenu();
 
 	char choice = toupper(getchar());
 
@@ -118,31 +129,29 @@ int main() {
 		exit(1);
 	} else if (choice == 'E') {
 		show_record();
-		goto menu;
 	} else if (choice == 'S') {
-		int difficulty;
+
 		struct Player player;
 
 		printf("Nev:");
 		scanf("%s", &player.name);
-
 		printf("Valasszon nehezseget:\nKonnyuk(1)      Kozepes(2)     Nehez(3)\n");
 		scanf("%d", &player.difficulty);
 
 		struct List *list = malloc(sizeof(struct List));
-
 		readQuestions(list);
 
-//		Talald ki h a nehezeseg mert nem jo vszeg vmi a pointerrel
+		askQuestion(list, &player.difficulty);
+
 //		Egy listaban tarolod oket aztan majd mikor hasznalod akkor csekkolod h mekkora a difficulty vmi confitionnel if(&list->last->difficulty > 10)...
 //		Assszem amugyis majd rendezned kell a listat
 		printf("Lista merete: %d\n", list->size);
-		printf("Elso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->question, &list->first->rightanwser, &list->first->difficulty);
+		printf("Elso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->question, &list->first->rightanwser, list->first->difficulty);
 
 		printf("Masodik elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->next->question, &list->first->next->rightanwser,
-				&list->first->next->difficulty);
+				list->first->next->difficulty);
 
-		printf("Uccso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->last->question, &list->last->rightanwser, &list->last->difficulty);
+		printf("Uccso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->last->question, &list->last->rightanwser, list->last->difficulty);
 
 	}
 	return 0;
