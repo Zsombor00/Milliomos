@@ -1,164 +1,151 @@
+/*
+ ============================================================================
+ Name        : helloworld.c
+ Author      : ZsK
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <string.h>
+//#include <string.h>
 
+//Structures definitions
 
-/*int k;
-    int stopwatch_start=time(0);
-    scanf("%d",&k);
-    int stopwatch_end=time(0);
-    int gametime=stopwatch_end-stopwatch_start;
-    ido elteltido=idofgv(gametime);
-    printf("%d:%d:%d",elteltido.hour, elteltido.min, elteltido.sec );*/ //Stopper a játékidõ méréséhez.
+//Ehelyett nem tudsz time.h-t hasznalni?
+typedef struct GameTime {
+  int hour;
+  int min;
+  int sec;
+};
 
-typedef struct gameTime
+typedef struct Question //Ideiglenes, amï¿½g nem vï¿½logatom szï¿½t a kï¿½rdï¿½seket nehï¿½zsï¿½g szerint (tesztelï¿½si cï¿½l).
 {
-    int hour;
-    int min;
-    int sec;
-} gameTime;
+  int difficulty;
+  char question[200];
+  char anwserA[200];
+  char anwserB[200];
+  char anwserC[200];
+  char anwserD[200];
+  char rightanwser;
 
-gameTime idofgv (int masodpercben) //Másodpercet idõformátumba(óra, perc, másodperc) átváltó függvény.
+  struct Question *next;
+};
+
+typedef struct List {
+  struct Question *first;
+  struct Question *last;
+
+  int size;
+};
+
+typedef struct Player //A jï¿½tï¿½kosok "tulajdonsï¿½gai".
 {
-    gameTime jatek;
-    int marad;
+  const char name[15]; //Neve (max 15 karakter).
+  int difficulty; // A vï¿½lasztott nehï¿½zsï¿½g.
+  int prize; //Nyeremï¿½ny Ft-ban.
+  struct GameTime elapsed_time; //Jï¿½tï¿½kidï¿½.
+  struct Player* next_player;
+};
 
-    jatek.hour=masodpercben/3600;
-    marad=masodpercben%3600;
-    jatek.min=marad/60;
-    jatek.sec=marad%60;
 
-    return jatek;
+//Function definitions
+
+struct GameTime idofgv(int masodpercben) //Mï¿½sodpercet idï¿½formï¿½tumba(ï¿½ra, perc, mï¿½sodperc) ï¿½tvï¿½ltï¿½ fï¿½ggvï¿½ny.
+{
+  struct GameTime jatek;
+  int marad;
+
+  jatek.hour = masodpercben / 3600;
+  marad = masodpercben % 3600;
+  jatek.min = marad / 60;
+  jatek.sec = marad % 60;
+
+  return jatek;
 
 }
 
-
-
-typedef struct player_elem //A játékosok "tulajdonságai".
-{
-    const char name[15]; //Neve (max 15 karakter).
-    int difficulty; // A választott nehézség.
-    int prize; //Nyeremény Ft-ban.
-    gameTime elapsed_time;//Játékidõ.
-    struct player_elem* next_player;
-
-} player_elem;
-
-typedef struct question
-{
-    int difficulty;//Kérdés nehézsége.
-    char question[200];//Kérdés.
-    char anwserA[200];//A válasz.
-    char anwserB[200];//B válasz.
-    char anwserC[200];//C válasz.
-    char anwserD[200];//D válasz.
-    char rightanwser;//Helyes válasz betûje.
-    struct question *next_question;
-} question;
-
-void show_record()
-{
+void show_record() {
 
 }
 
-int read(question *questions, int counter, FILE *fp) //Egy sort beolvas a fileból és felbontja (ciklusba kellene rakni,de arra még nem találtam megoldást, hogy pontosan milyenbe.
-{
-    int i;
-    i=fscanf(fp,"%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c",&questions[counter].difficulty,&questions[counter].question,
-             &questions[counter].anwserA,&questions[counter].anwserB,&questions[counter].anwserC,
-             &questions[counter].anwserD,&questions[counter].rightanwser);
-    return i;
-}
+void readQuestions(struct List *list) {
+  printf("Reading questions...");
 
+  FILE *filepointer = fopen("/Users/kornelkotan/workspaces/eclipse-cpp-ws/millionaire/src/loim.txt", "r");
+  if (filepointer == NULL) {
+    perror("Error");
+  } else {
+    while (!feof(filepointer)) {
 
+      struct Question *q = (struct Question*) malloc(sizeof(struct Question));
 
-int main()
-{
-    printf("________________________________________\n");
-    printf("       LEGYEN ON IS MILLIOMOS!\n");
-    printf("________________________________________\n");
-    printf("________________________________________\n");
-    printf(" -> Nyomjon S-t a jatek inditasahoz\n");
-    printf(" -> Nyomjon E-t az eredmenyek megtekintesehez\n");
-    printf(" -> Nyomjon Q-t a kilepeshez\n");
-    printf("________________________________________\n");
+      fscanf(filepointer, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c", &q->difficulty, &q->question, &q->anwserA, &q->anwserB, &q->anwserC, &q->anwserD,
+          &q->rightanwser);
 
-    char choice;
-    scanf ("%c",&choice);
-    switch (choice) {
-    case 'Q':
-    case 'q':
-    exit(1);
-    break;
+      q->next = NULL;
 
-    case 'E':
-    case 'e':
-    show_record();
-    break;
+      if (list->first == NULL) {
+        list->first = q;
+      } else {
+        list->last->next = q;
+      }
 
-   case 'S':
-   case 's':
+      list->last = q;
+      list->size++;
 
-       printf("\n");
-
-        int difficulty;
-        player_elem plyr;
-
-        printf("Nev:");
-        scanf("%s", &plyr.name);
-
-        printf("Valasszon nehezseget:\nKonnyu(1)      Kozepes(2)     Nehez(3)\n");
-        scanf("%d",&plyr.difficulty);
-
-        FILE *filepointer=fopen("loim.txt","r");
-        int row=0;
-        question questions[2000];
-
-
-        //read(questions,row,filepointer);
-
-        while (!feof(filepointer))
-           {
-               read(questions,row,filepointer);
-
-
-        printf("%s\n",questions[row].anwserC);
-         row++;
-
-
-
-               if (1<=difficulty<=5)
-               {
-                   read(questions,row,filepointer);
-               }
-
-               else if (6<=difficulty<=10)
-
-               {
-                   read(questions,row,filepointer);
-               }
-
-               else if (11<=difficulty<=15)
-               {
-                   read(questions,row,filepointer);
-               }
-
-
-           }
-
-    break;
     }
-    return 0;
+  }
+}
+//Main
+
+int main() {
+  menu: printf("________________________________________\n");
+  printf("       LEGYEN ON IS MILLIOMOS!\n");
+  printf("________________________________________\n");
+  printf("________________________________________\n");
+  printf(" -> Nyomjon S-t a jatek inditasahoz\n");
+  printf(" -> Nyomjon E-t az eredmenyek megtekintesehez\n");
+  printf(" -> Nyomjon Q-t a kilepeshez\n");
+  printf("________________________________________\n");
+
+  char choice = toupper(getchar());
+
+  if (choice == 'Q') {
+    exit(1);
+  } else if (choice == 'E') {
+    show_record();
+    goto menu;
+  } else if (choice == 'S') {
+    int difficulty;
+    struct Player player;
+
+    printf("Nev:");
+    scanf("%s", &player.name);
+
+    printf("Valasszon nehezseget:\nKonnyuk(1)      Kozepes(2)     Nehez(3)\n");
+    scanf("%d", &player.difficulty);
+
+    struct List *list = malloc(sizeof(struct List));
+
+    readQuestions(list);
+
+//    Talald ki h a nehezeseg mert nem jo vszeg vmi a pointerrel
+//    Egy listaban tarolod oket aztan majd mikor hasznalod akkor csekkolod h mekkora a difficulty vmi confitionnel if(&list->last->difficulty > 10)...
+//    Assszem amugyis majd rendezned kell a listat
+    printf("Lista merete: %d\n", list->size);
+    printf("Elso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->question, &list->first->rightanwser, &list->first->difficulty);
+
+    printf("Masodik elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->next->question, &list->first->next->rightanwser,
+        &list->first->next->difficulty);
+
+    printf("Uccso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->last->question, &list->last->rightanwser, &list->last->difficulty);
+
+  }
+  return 0;
 
 }
-
-
-
-
-
-
-
-
-
 
