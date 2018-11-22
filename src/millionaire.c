@@ -13,6 +13,7 @@
 #include <time.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 //Structures definitions
 
@@ -78,14 +79,12 @@ void showMenu() {
 	printf("________________________________________\n");
 }
 
-void showScores() {
+void showScores(struct Player *player) {
 	printf("________________________________________\n");
 	printf("\t\tBEST SCORES\n");
 	printf("________________________________________\n");
 	printf("________________________________________\n");
-	printf(" 1:\t Bob \t 300000FT \n");
-	printf(" 2:\t Joe \t 200000FT \n");
-	printf(" 3:\t Jack \t 100000FT \n");
+	printf(" 1:\t %s \t %d Rounds \n", player->name, player->prize);
 	printf("________________________________________\n");
 }
 
@@ -122,9 +121,8 @@ void printQuestion(struct Question* iterator) {
 	printf("A: %s\t B: %s\t C: %s\t D: %s \n", iterator->anwserA, iterator->anwserB, iterator->anwserC, iterator->anwserD);
 }
 
-void askQuestions(struct List *list) {
-	struct Question *iterator = list->first;
-	while (iterator->next != NULL) {
+bool askQuestion(struct Question *iterator) {
+
 		printQuestion(iterator);
 
 		getchar(); //to read empty new line
@@ -134,16 +132,16 @@ void askQuestions(struct List *list) {
 
 		if (answer == iterator->rightanwser) {
 			printf("A valasz helyes!\n\n\n");
+			return true;
 
 		} else {
 			printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
-			break;
+			iterator = iterator->next;
+			return false;
 		}
 
-		iterator = iterator->next;
 	}
 
-}
 
 //Main
 
@@ -155,7 +153,7 @@ int main() {
 	if (choice == 'Q') {
 		exit(1);
 	} else if (choice == 'E') {
-		showScores();
+//		showScores();
 	} else if (choice == 'S') {
 		struct Player player;
 
@@ -167,11 +165,20 @@ int main() {
 		struct List *list = malloc(sizeof(struct List));
 		readQuestions(list);
 
-		askQuestions(list);
+
+		struct Question *iterator = list->first;
+		bool isAnswerRight = true;
+		while(isAnswerRight){
+			isAnswerRight = askQuestion(iterator);
+			iterator = iterator->next;
+			player.prize++;
+		}
+
+
 
 		printf("####GAME OVER####\n");
 
-		showScores();
+		showScores(&player);
 	}
 	return 0;
 
