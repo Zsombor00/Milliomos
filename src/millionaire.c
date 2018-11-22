@@ -11,16 +11,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//#include <string.h>
+#include <string.h>
+#include <ctype.h>
 
 //Structures definitions
 
 //Ehelyett nem tudsz time.h-t hasznalni?
-typedef struct GameTime {
-	int hour;
-	int min;
-	int sec;
-};
+//typedef struct GameTime {
+//	int hour;
+//	int min;
+//	int sec;
+//};
 
 typedef struct Question //Ideiglenes, am�g nem v�logatom sz�t a k�rd�seket neh�zs�g szerint (tesztel�si c�l).
 {
@@ -47,25 +48,25 @@ typedef struct Player //A j�t�kosok "tulajdons�gai".
 	const char name[15]; //Neve (max 15 karakter).
 	int difficulty; // A v�lasztott neh�zs�g.
 	int prize; //Nyerem�ny Ft-ban.
-	struct GameTime elapsed_time; //J�t�kid�.
+//	struct GameTime elapsed_time; //J�t�kid�.
 	struct Player* next_player;
 };
 
 //Function definitions
 
-struct GameTime idofgv(int masodpercben) //M�sodpercet id�form�tumba(�ra, perc, m�sodperc) �tv�lt� f�ggv�ny.
-{
-	struct GameTime jatek;
-	int marad;
-
-	jatek.hour = masodpercben / 3600;
-	marad = masodpercben % 3600;
-	jatek.min = marad / 60;
-	jatek.sec = marad % 60;
-
-	return jatek;
-
-}
+//struct GameTime idofgv(int masodpercben) //M�sodpercet id�form�tumba(�ra, perc, m�sodperc) �tv�lt� f�ggv�ny.
+//{
+//	struct GameTime jatek;
+//	int marad;
+//
+//	jatek.hour = masodpercben / 3600;
+//	marad = masodpercben % 3600;
+//	jatek.min = marad / 60;
+//	jatek.sec = marad % 60;
+//
+//	return jatek;
+//
+//}
 
 void show_record() {
 
@@ -74,14 +75,14 @@ void show_record() {
 void readQuestions(struct List *list) {
 	printf("Reading questions...\n");
 
-	FILE *filepointer = fopen("src/loim.txt", "r");
-	if (filepointer == NULL) {
+	FILE *filePointer = fopen("src/loim.txt", "r");
+	if (filePointer == NULL) {
 		perror("Error");
 	} else {
-		while (!feof(filepointer)) {
+		while (!feof(filePointer)) {
 			struct Question *q = (struct Question*) malloc(sizeof(struct Question));
 
-			fscanf(filepointer, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c", &q->difficulty, &q->question, &q->anwserA, &q->anwserB, &q->anwserC, &q->anwserD,
+			fscanf(filePointer, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c", &q->difficulty, &q->question, &q->anwserA, &q->anwserB, &q->anwserC, &q->anwserD,
 					&q->rightanwser);
 			q->next = NULL;
 
@@ -95,6 +96,7 @@ void readQuestions(struct List *list) {
 			list->size++;
 		}
 	}
+	fclose(filePointer);
 }
 
 void showMenu() {
@@ -108,14 +110,31 @@ void showMenu() {
 	printf("________________________________________\n");
 }
 
-void askQuestion(struct List *list, int difficulty) {
-//	struct Question iterator = list->first;
-//	while(iterator!=NULL)
-//	{
-//		if(iterator->difficulty )
-//	     // do something
-//		iterator= iterator->next;
-//	}
+void printQuestion(struct Question* iterator) {
+	printf("%s\t Nehezseg: %d \n", iterator->question, iterator->difficulty);
+	printf("A: %s\t B: %s\t C: %s\t D: %s \n", iterator->anwserA, iterator->anwserB, iterator->anwserC, iterator->anwserD);
+}
+
+void askQuestions(struct List *list) {
+	struct Question *iterator = list->first;
+	while (iterator->next != NULL) {
+		printQuestion(iterator);
+
+		getchar();//to read empty new line
+		char answer = toupper(getchar());
+
+		printf("A valaszt megjeloltuk: %c\n", answer);
+
+		if (answer == iterator->rightanwser) {
+			printf("A valasz helyes!\n\n\n");
+
+		} else {
+			printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
+		}
+
+		iterator = iterator->next;
+	}
+
 }
 
 //Main
@@ -130,28 +149,20 @@ int main() {
 	} else if (choice == 'E') {
 		show_record();
 	} else if (choice == 'S') {
-
 		struct Player player;
 
 		printf("Nev:");
 		scanf("%s", &player.name);
-		printf("Valasszon nehezseget:\nKonnyuk(1)      Kozepes(2)     Nehez(3)\n");
+		printf("Valasszon nehezseget:\nKonnyu(1)      Kozepes(2)     Nehez(3)\n");
 		scanf("%d", &player.difficulty);
 
 		struct List *list = malloc(sizeof(struct List));
 		readQuestions(list);
+		printf("Kerdes lista merete: %d\n", list->size);
 
-		askQuestion(list, &player.difficulty);
+		askQuestions(list);
 
-//		Egy listaban tarolod oket aztan majd mikor hasznalod akkor csekkolod h mekkora a difficulty vmi confitionnel if(&list->last->difficulty > 10)...
-//		Assszem amugyis majd rendezned kell a listat
-		printf("Lista merete: %d\n", list->size);
-		printf("Elso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->question, &list->first->rightanwser, list->first->difficulty);
-
-		printf("Masodik elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->first->next->question, &list->first->next->rightanwser,
-				list->first->next->difficulty);
-
-		printf("Uccso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->last->question, &list->last->rightanwser, list->last->difficulty);
+//		printf("Uccso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->last->question, &list->last->rightanwser, list->last->difficulty);
 
 	}
 	return 0;
