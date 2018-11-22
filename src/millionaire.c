@@ -49,8 +49,9 @@ typedef struct Player //A j�t�kosok "tulajdons�gai".
 	char name[15]; //Neve (max 15 karakter).
 	int difficulty; // A v�lasztott neh�zs�g.
 	int prize; //Nyerem�ny Ft-ban.
+	bool audienceHelpAvailable;
+	bool halfHelpAvailable;
 	struct GameTime *gameTime;
-	struct Player *next_player;
 };
 
 //Function definitions
@@ -86,6 +87,8 @@ void registerPlayer(struct Player* player) {
 	} else {
 		player->difficulty = d;
 	}
+	player->halfHelpAvailable = true;
+	player->audienceHelpAvailable = true;
 }
 
 void readQuestions(struct List *list) {
@@ -119,23 +122,52 @@ void readQuestions(struct List *list) {
 void printQuestion(struct Question* iterator) {
 	printf("%s\t Nehezseg: %d \n", iterator->question, iterator->level);
 	printf("A: %s\t B: %s\t C: %s\t D: %s \n", iterator->anwserA, iterator->anwserB, iterator->anwserC, iterator->anwserD);
+	printf("#################################################################\n");
+}
+
+void printAvailableHelp(struct Player* player) {
+	printf("#################################################################\n");
+	printf("Hasznalhato segitsegek: ");
+	if (player->audienceHelpAvailable == true) {
+		printf("\t Kozonseg (K)");
+	}
+	if (player->halfHelpAvailable == true) {
+		printf("\t Felezes (F) ");
+	}
+	printf("\n");
+
+}
+
+char printQuestionScreenAndGetUserInput(char choice, struct Player* player, struct Question* iterator) {
+	printAvailableHelp(player);
+	printQuestion(iterator);
+	getchar(); //to read empty new line
+	choice = toupper(getchar());
+	if (choice != 'A' && choice != 'B' && choice != 'C' && choice != 'D' && choice != 'K' && choice != 'F') {
+		printf("Nincs ilyen opcio: %c  - Valassz mast!\n", choice);
+		choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
+	}
+	return choice;
 }
 
 bool askQuestionFromPlayer(struct Question *iterator, struct Player *player) {
+	char choice = 'Z';
+	choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
 
-	printQuestion(iterator);
+	if ((player->audienceHelpAvailable == true) && (choice == 'K')) {
+		player->audienceHelpAvailable = false;
+		printf("A kozonseg altal javasolt megoldas: %c \n\n", iterator->rightanwser);
+		choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
+	}
 
-	getchar(); //to read empty new line
-	char answer = toupper(getchar());
-
-	printf("A valaszt megjeloltuk: %c\n", answer);
-
-	if (answer == iterator->rightanwser) {
+	if (choice == iterator->rightanwser) {
+		printf("Megjeloltuk: %c \n", choice);
 		printf("A valasz helyes!\n\n\n");
 		player->prize++;
 		return true;
 
 	} else {
+		printf("Megjeloltuk: %c \n", choice);
 		printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
 		iterator = iterator->next;
 		return false;
