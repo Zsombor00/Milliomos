@@ -26,7 +26,7 @@
 
 typedef struct Question //Ideiglenes, am�g nem v�logatom sz�t a k�rd�seket neh�zs�g szerint (tesztel�si c�l).
 {
-	int difficulty;
+	int level;
 	char question[200];
 	char anwserA[200];
 	char anwserB[200];
@@ -105,7 +105,7 @@ void readQuestions(struct List *list) {
 		while (!feof(filePointer)) {
 			struct Question *q = (struct Question*) malloc(sizeof(struct Question));
 
-			fscanf(filePointer, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c", &q->difficulty, &q->question, &q->anwserA, &q->anwserB, &q->anwserC, &q->anwserD,
+			fscanf(filePointer, "%d|%[^|]|%[^|]|%[^|]|%[^|]|%[^|]|%c", &q->level, &q->question, &q->anwserA, &q->anwserB, &q->anwserC, &q->anwserD,
 					&q->rightanwser);
 			q->next = NULL;
 
@@ -124,30 +124,29 @@ void readQuestions(struct List *list) {
 }
 
 void printQuestion(struct Question* iterator) {
-	printf("%s\t Nehezseg: %d \n", iterator->question, iterator->difficulty);
+	printf("%s\t Nehezseg: %d \n", iterator->question, iterator->level);
 	printf("A: %s\t B: %s\t C: %s\t D: %s \n", iterator->anwserA, iterator->anwserB, iterator->anwserC, iterator->anwserD);
 }
 
 bool askQuestion(struct Question *iterator) {
 
-		printQuestion(iterator);
+	printQuestion(iterator);
 
-		getchar(); //to read empty new line
-		char answer = toupper(getchar());
+	getchar(); //to read empty new line
+	char answer = toupper(getchar());
 
-		printf("A valaszt megjeloltuk: %c\n", answer);
+	printf("A valaszt megjeloltuk: %c\n", answer);
 
-		if (answer == iterator->rightanwser) {
-			printf("A valasz helyes!\n\n\n");
-			return true;
+	if (answer == iterator->rightanwser) {
+		printf("A valasz helyes!\n\n\n");
+		return true;
 
-		} else {
-			printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
-			iterator = iterator->next;
-			return false;
-		}
+	} else {
+		printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
+		iterator = iterator->next;
+		return false;
 	}
-
+}
 
 //Main
 int main() {
@@ -169,11 +168,37 @@ int main() {
 
 		struct Question *iterator = list->first;
 		bool isAnswerRight = true;
-		while(isAnswerRight){
-			isAnswerRight = askQuestion(iterator);
-			if(isAnswerRight){
-				player.prize++;
+		while (isAnswerRight) {
+			switch (player.difficulty) {
+
+			case 1:
+				if (iterator->level <= 5) {
+					isAnswerRight = askQuestion(iterator);
+					if (isAnswerRight) {
+						player.prize++;
+					}
+				}
+				break;
+			case 2:
+				if (5 < iterator->level && iterator->level <= 10) {
+					isAnswerRight = askQuestion(iterator);
+					if (isAnswerRight) {
+						player.prize++;
+					}
+				}
+				break;
+			case 3:
+				if (10 < iterator->level) {
+					isAnswerRight = askQuestion(iterator);
+					if (isAnswerRight) {
+						player.prize++;
+					}
+				}
+				break;
+			default:
+				perror("Invalid player level");
 			}
+
 			iterator = iterator->next;
 		}
 
