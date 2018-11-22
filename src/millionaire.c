@@ -67,9 +67,26 @@ typedef struct Player //A j�t�kosok "tulajdons�gai".
 //	return jatek;
 //
 //}
+void showMenu() {
+	printf("________________________________________\n");
+	printf("       LEGYEN ON IS MILLIOMOS!\n");
+	printf("________________________________________\n");
+	printf("________________________________________\n");
+	printf(" -> Nyomjon S-t a jatek inditasahoz\n");
+	printf(" -> Nyomjon E-t az eredmenyek megtekintesehez\n");
+	printf(" -> Nyomjon Q-t a kilepeshez\n");
+	printf("________________________________________\n");
+}
 
-void show_record() {
-
+void showScores() {
+	printf("________________________________________\n");
+	printf("\t\tBEST SCORES\n");
+	printf("________________________________________\n");
+	printf("________________________________________\n");
+	printf(" 1:\t Bob \t 300000FT \n");
+	printf(" 2:\t Joe \t 200000FT \n");
+	printf(" 3:\t Jack \t 100000FT \n");
+	printf("________________________________________\n");
 }
 
 void readQuestions(struct List *list) {
@@ -97,17 +114,7 @@ void readQuestions(struct List *list) {
 		}
 	}
 	fclose(filePointer);
-}
-
-void showMenu() {
-	printf("________________________________________\n");
-	printf("       LEGYEN ON IS MILLIOMOS!\n");
-	printf("________________________________________\n");
-	printf("________________________________________\n");
-	printf(" -> Nyomjon S-t a jatek inditasahoz\n");
-	printf(" -> Nyomjon E-t az eredmenyek megtekintesehez\n");
-	printf(" -> Nyomjon Q-t a kilepeshez\n");
-	printf("________________________________________\n");
+	printf("Kerdesek beolvasva, lista merete: %d\n\n", list->size);
 }
 
 void printQuestion(struct Question* iterator) {
@@ -120,7 +127,7 @@ void askQuestions(struct List *list) {
 	while (iterator->next != NULL) {
 		printQuestion(iterator);
 
-		getchar();//to read empty new line
+		getchar(); //to read empty new line
 		char answer = toupper(getchar());
 
 		printf("A valaszt megjeloltuk: %c\n", answer);
@@ -130,6 +137,7 @@ void askQuestions(struct List *list) {
 
 		} else {
 			printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
+			break;
 		}
 
 		iterator = iterator->next;
@@ -147,7 +155,7 @@ int main() {
 	if (choice == 'Q') {
 		exit(1);
 	} else if (choice == 'E') {
-		show_record();
+		showScores();
 	} else if (choice == 'S') {
 		struct Player player;
 
@@ -158,12 +166,12 @@ int main() {
 
 		struct List *list = malloc(sizeof(struct List));
 		readQuestions(list);
-		printf("Kerdes lista merete: %d\n", list->size);
 
 		askQuestions(list);
 
-//		printf("Uccso elem: kerdes: %s, valasz: %s, nehezseg: %d \n", &list->last->question, &list->last->rightanwser, list->last->difficulty);
+		printf("####GAME OVER####\n");
 
+		showScores();
 	}
 	return 0;
 
