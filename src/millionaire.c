@@ -14,15 +14,15 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <time.h>
 
 //Structures definitions
 
 //Ehelyett nem tudsz time.h-t hasznalni?
-//typedef struct GameTime {
-//	int hour;
-//	int min;
-//	int sec;
-//};
+typedef struct GameTime {
+	int min;
+	int sec;
+};
 
 typedef struct Question //Ideiglenes, am�g nem v�logatom sz�t a k�rd�seket neh�zs�g szerint (tesztel�si c�l).
 {
@@ -49,25 +49,11 @@ typedef struct Player //A j�t�kosok "tulajdons�gai".
 	char name[15]; //Neve (max 15 karakter).
 	int difficulty; // A v�lasztott neh�zs�g.
 	int prize; //Nyerem�ny Ft-ban.
-//	struct GameTime elapsed_time; //J�t�kid�.
-	struct Player* next_player;
+	struct GameTime *gameTime;
+	struct Player *next_player;
 };
 
 //Function definitions
-
-//struct GameTime idofgv(int masodpercben) //M�sodpercet id�form�tumba(�ra, perc, m�sodperc) �tv�lt� f�ggv�ny.
-//{
-//	struct GameTime jatek;
-//	int marad;
-//
-//	jatek.hour = masodpercben / 3600;
-//	marad = masodpercben % 3600;
-//	jatek.min = marad / 60;
-//	jatek.sec = marad % 60;
-//
-//	return jatek;
-//
-//}
 void showMenu() {
 	printf("________________________________________\n");
 	printf("       LEGYEN ON IS MILLIOMOS!\n");
@@ -83,8 +69,8 @@ void showScores(struct Player *player) {
 	printf("________________________________________\n");
 	printf("\t\tBEST SCORES\n");
 	printf("________________________________________\n");
-	printf("________________________________________\n");
-	printf(" 1:\t %s \t %d Rounds \n", player->name, player->prize);
+	printf("Rank\t Name\t Price\t Time\n");
+	printf(" 1:\t %s\t %d\t %dm %ds \n", player->name, player->prize, player->gameTime->min, player->gameTime->sec);
 	printf("________________________________________\n");
 }
 
@@ -155,6 +141,18 @@ bool askQuestion(struct Question *iterator) {
 	}
 }
 
+void setPlayTime(int elapsedTime, struct Player* player) {
+	player->gameTime = (struct GameTime*) malloc(sizeof(struct GameTime));
+	player->gameTime->min = (int) floor(elapsedTime / 60);
+	player->gameTime->sec = elapsedTime % 60;
+}
+
+clock_t measureTime() {
+	clock_t timePoint;
+	time(&timePoint);
+	return timePoint;
+}
+
 //Main
 int main() {
 	showMenu();
@@ -167,11 +165,12 @@ int main() {
 //		showScores();
 	} else if (choice == 'S') {
 		struct Player player;
-
 		registerPlayer(&player);
 
 		struct List *list = malloc(sizeof(struct List));
 		readQuestions(list);
+
+		clock_t startTime = measureTime();
 
 		struct Question *iterator = list->first;
 		bool isAnswerRight = true;
@@ -208,7 +207,9 @@ int main() {
 
 			iterator = iterator->next;
 		}
-
+		clock_t finishTime = measureTime();
+		int elapsedTime = difftime(finishTime,startTime);
+		setPlayTime(elapsedTime, &player);
 		printf("####GAME OVER####\n");
 		showScores(&player);
 	}
