@@ -159,17 +159,17 @@ bool askQuestionFromPlayer(struct Question *iterator, struct Player *player) {
 		choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
 	}
 
-	if ((player->audienceHelpAvailable == true) && (choice == 'F')) {
-			player->halfHelpAvailable = false;
-			//Ide talalj ki valami jobb logikat
-			printf("A megmaradt opciok: \t%c  es ", iterator->rightanwser);
-			if(iterator->rightanwser == 'D'){
-				printf("\tC \n\n");
-			}else{
-				printf("\tD \n\n");
-			}
-			choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
+	if ((player->halfHelpAvailable == true) && (choice == 'F')) {
+		player->halfHelpAvailable = false;
+		//Ide talalj ki valami jobb logikat
+		printf("A megmaradt opciok: \t%c  es ", iterator->rightanwser);
+		if (iterator->rightanwser == 'D') {
+			printf("\tC \n\n");
+		} else {
+			printf("\tD \n\n");
 		}
+		choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
+	}
 
 	if (choice == iterator->rightanwser) {
 		printf("Megjeloltuk: %c \n", choice);
