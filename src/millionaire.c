@@ -92,7 +92,14 @@ void registerPlayer(struct Player* player) {
 	printf("Nev:");
 	scanf("%s", &player->name);
 	printf("Valasszon nehezseget:\nKonnyu(1)      Kozepes(2)     Nehez(3)\n");
-	scanf("%d", &player->difficulty);
+	int d = 0;
+	scanf("%d", &d);
+	if (d != 1 && d != 2 && d != 3) {
+		perror("Nincs ilyen nehezseg");
+		exit(-1);
+	} else {
+		player->difficulty = d;
+	}
 }
 
 void readQuestions(struct List *list) {
