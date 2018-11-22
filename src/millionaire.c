@@ -121,7 +121,7 @@ void printQuestion(struct Question* iterator) {
 	printf("A: %s\t B: %s\t C: %s\t D: %s \n", iterator->anwserA, iterator->anwserB, iterator->anwserC, iterator->anwserD);
 }
 
-bool askQuestion(struct Question *iterator) {
+bool askQuestionFromPlayer(struct Question *iterator, struct Player *player) {
 
 	printQuestion(iterator);
 
@@ -132,6 +132,7 @@ bool askQuestion(struct Question *iterator) {
 
 	if (answer == iterator->rightanwser) {
 		printf("A valasz helyes!\n\n\n");
+		player->prize++;
 		return true;
 
 	} else {
@@ -167,7 +168,9 @@ int main() {
 		struct Player player;
 		registerPlayer(&player);
 
-		struct List *list = malloc(sizeof(struct List));
+		struct List *list = (struct List*) malloc(sizeof(struct List));
+		list->first = NULL;
+		list->size = 0;
 		readQuestions(list);
 
 		clock_t startTime = measureTime();
@@ -179,26 +182,17 @@ int main() {
 
 			case 1:
 				if (iterator->level <= 5) {
-					isAnswerRight = askQuestion(iterator);
-					if (isAnswerRight) {
-						player.prize++;
-					}
+					isAnswerRight = askQuestionFromPlayer(iterator, &player);
 				}
 				break;
 			case 2:
 				if (5 < iterator->level && iterator->level <= 10) {
-					isAnswerRight = askQuestion(iterator);
-					if (isAnswerRight) {
-						player.prize++;
-					}
+					isAnswerRight = askQuestionFromPlayer(iterator, &player);
 				}
 				break;
 			case 3:
 				if (10 < iterator->level) {
-					isAnswerRight = askQuestion(iterator);
-					if (isAnswerRight) {
-						player.prize++;
-					}
+					isAnswerRight = askQuestionFromPlayer(iterator, &player);
 				}
 				break;
 			default:
@@ -208,7 +202,7 @@ int main() {
 			iterator = iterator->next;
 		}
 		clock_t finishTime = measureTime();
-		int elapsedTime = difftime(finishTime,startTime);
+		int elapsedTime = difftime(finishTime, startTime);
 		setPlayTime(elapsedTime, &player);
 		printf("####GAME OVER####\n");
 		showScores(&player);
