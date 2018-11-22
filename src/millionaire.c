@@ -135,7 +135,6 @@ void printAvailableHelp(struct Player* player) {
 		printf("\t Felezes (F) ");
 	}
 	printf("\n");
-
 }
 
 char printQuestionScreenAndGetUserInput(char choice, struct Player* player, struct Question* iterator) {
@@ -160,6 +159,18 @@ bool askQuestionFromPlayer(struct Question *iterator, struct Player *player) {
 		choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
 	}
 
+	if ((player->audienceHelpAvailable == true) && (choice == 'F')) {
+			player->halfHelpAvailable = false;
+			//Ide talalj ki valami jobb logikat
+			printf("A megmaradt opciok: \t%c  es ", iterator->rightanwser);
+			if(iterator->rightanwser == 'D'){
+				printf("\tC \n\n");
+			}else{
+				printf("\tD \n\n");
+			}
+			choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
+		}
+
 	if (choice == iterator->rightanwser) {
 		printf("Megjeloltuk: %c \n", choice);
 		printf("A valasz helyes!\n\n\n");
@@ -169,7 +180,6 @@ bool askQuestionFromPlayer(struct Question *iterator, struct Player *player) {
 	} else {
 		printf("Megjeloltuk: %c \n", choice);
 		printf("A valasz helytelen. A jo valasz: %c\n\n\n", iterator->rightanwser);
-		iterator = iterator->next;
 		return false;
 	}
 }
