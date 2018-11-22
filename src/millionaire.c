@@ -46,7 +46,7 @@ typedef struct List {
 
 typedef struct Player //A j�t�kosok "tulajdons�gai".
 {
-	const char name[15]; //Neve (max 15 karakter).
+	char name[15]; //Neve (max 15 karakter).
 	int difficulty; // A v�lasztott neh�zs�g.
 	int prize; //Nyerem�ny Ft-ban.
 //	struct GameTime elapsed_time; //J�t�kid�.
@@ -86,6 +86,13 @@ void showScores(struct Player *player) {
 	printf("________________________________________\n");
 	printf(" 1:\t %s \t %d Rounds \n", player->name, player->prize);
 	printf("________________________________________\n");
+}
+
+void registerPlayer(struct Player* player) {
+	printf("Nev:");
+	scanf("%s", &player->name);
+	printf("Valasszon nehezseget:\nKonnyu(1)      Kozepes(2)     Nehez(3)\n");
+	scanf("%d", &player->difficulty);
 }
 
 void readQuestions(struct List *list) {
@@ -139,12 +146,10 @@ bool askQuestion(struct Question *iterator) {
 			iterator = iterator->next;
 			return false;
 		}
-
 	}
 
 
 //Main
-
 int main() {
 	showMenu();
 
@@ -157,30 +162,24 @@ int main() {
 	} else if (choice == 'S') {
 		struct Player player;
 
-		printf("Nev:");
-		scanf("%s", &player.name);
-		printf("Valasszon nehezseget:\nKonnyu(1)      Kozepes(2)     Nehez(3)\n");
-		scanf("%d", &player.difficulty);
+		registerPlayer(&player);
 
 		struct List *list = malloc(sizeof(struct List));
 		readQuestions(list);
-
 
 		struct Question *iterator = list->first;
 		bool isAnswerRight = true;
 		while(isAnswerRight){
 			isAnswerRight = askQuestion(iterator);
+			if(isAnswerRight){
+				player.prize++;
+			}
 			iterator = iterator->next;
-			player.prize++;
 		}
 
-
-
 		printf("####GAME OVER####\n");
-
 		showScores(&player);
 	}
 	return 0;
-
 }
 
