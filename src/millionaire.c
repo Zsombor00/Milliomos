@@ -114,6 +114,7 @@ void readQuestions(struct List *list) {
 			list->last = q;
 			list->size++;
 		}
+		list->last->next=list->first; //Hogy ne fogyjunk ki kerdesekbol, a lancolt lista utolso eleme az elsore mutat.
 	}
 	fclose(filePointer);
 	printf("Kerdesek beolvasva, lista merete: %d\n\n", list->size);
@@ -150,7 +151,7 @@ char printQuestionScreenAndGetUserInput(char choice, struct Player* player, stru
 }
 
 bool askQuestionFromPlayer(struct Question *iterator, struct Player *player) {
-	char choice = 'Z';
+	char choice;
 	choice = printQuestionScreenAndGetUserInput(choice, player, iterator);
 
 	if ((player->audienceHelpAvailable == true) && (choice == 'K')) {
@@ -220,6 +221,8 @@ int main() {
 		struct Question *iterator = list->first;
 		bool isAnswerRight = true;
 		while (isAnswerRight) {
+			for (int i = 0; i < (rand() % 10); i++) //We move the iterator with a random number to avoid having the same questions
+				iterator = iterator->next;
 			switch (player.difficulty) {
 
 			case 1:
@@ -240,8 +243,6 @@ int main() {
 			default:
 				perror("Invalid player level");
 			}
-
-			iterator = iterator->next;
 		}
 		clock_t finishTime = measureTime();
 		int elapsedTime = difftime(finishTime, startTime);
