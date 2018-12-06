@@ -1,0 +1,5 @@
+1|Szecska|3000000|1|40
+1|Donatello|800000|1|38
+3|Szuszi|100000|1|32
+1|Zsombor|50000|0|35
+2|Raphaello|40000|4|11
